@@ -11,6 +11,9 @@ import documentRoutes from './routes/documents.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const app = express();
 
 // ── Security Middleware ──────────────────────────────────
@@ -71,7 +74,7 @@ app.use('/api/documents', documentRoutes);
 
 // ── Serve Client in Production ───────────────────────────
 if (process.env.NODE_ENV === 'production') {
-  const clientDist = path.join(process.cwd(), '..', 'client', 'dist');
+  const clientDist = path.join(__dirname, '..', 'client', 'dist');
   app.use(express.static(clientDist));
   app.get('/{*path}', (req, res) => {
     // Don't intercept API or upload routes
