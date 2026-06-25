@@ -11,7 +11,9 @@ export const getProjects = async (req, res) => {
 
 export const createProject = async (req, res) => {
   try {
-    const project = await Project.create(req.body);
+    // Destructure only expected fields — prevents mass-assignment
+    const { title, description, category, tags, image, githubUrl, liveUrl, featured, date } = req.body;
+    const project = await Project.create({ title, description, category, tags, image, githubUrl, liveUrl, featured, date });
     res.status(201).json(project);
   } catch (err) {
     res.status(400).json({ message: err.message });
@@ -20,7 +22,12 @@ export const createProject = async (req, res) => {
 
 export const updateProject = async (req, res) => {
   try {
-    const project = await Project.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const { title, description, category, tags, image, githubUrl, liveUrl, featured, date } = req.body;
+    const project = await Project.findByIdAndUpdate(
+      req.params.id,
+      { title, description, category, tags, image, githubUrl, liveUrl, featured, date },
+      { new: true, runValidators: true }
+    );
     if (!project) return res.status(404).json({ message: 'Project not found' });
     res.json(project);
   } catch (err) {

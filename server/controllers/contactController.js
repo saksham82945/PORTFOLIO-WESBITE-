@@ -1,11 +1,18 @@
 import nodemailer from 'nodemailer';
 import Message from '../models/Message.js';
+import { escapeHtml } from '../utils/escapeHtml.js';
 
 export const submitContact = async (req, res) => {
   const { name, email, subject, message } = req.body;
   try {
-    // Save to DB
+    // Save to DB — only allowed fields
     const msg = await Message.create({ name, email, subject, message });
+
+    // Escape user inputs before inserting into HTML email
+    const safeName    = escapeHtml(name);
+    const safeEmail   = escapeHtml(email);
+    const safeSubject = escapeHtml(subject);
+    const safeMessage = escapeHtml(message);
 
     // Send email via Nodemailer
     const transporter = nodemailer.createTransport({
@@ -16,13 +23,13 @@ export const submitContact = async (req, res) => {
     await transporter.sendMail({
       from: `"Portfolio Contact" <${process.env.EMAIL_USER}>`,
       to: process.env.EMAIL_USER,
-      subject: `[Portfolio] ${subject}`,
+      subject: `[Portfolio] ${safeSubject}`,
       html: `
-        <h2>New message from ${name}</h2>
-        <p><strong>Email:</strong> ${email}</p>
-        <p><strong>Subject:</strong> ${subject}</p>
+        <h2>New message from ${safeName}</h2>
+        <p><strong>Email:</strong> ${safeEmail}</p>
+        <p><strong>Subject:</strong> ${safeSubject}</p>
         <p><strong>Message:</strong></p>
-        <p>${message}</p>
+        <p>${safeMessage}</p>
       `,
     });
 
@@ -45,6 +52,7 @@ export const getMessages = async (req, res) => {
 export const markAsRead = async (req, res) => {
   try {
     const msg = await Message.findByIdAndUpdate(req.params.id, { read: true }, { new: true });
+    if (!msg) return res.status(404).json({ message: 'Message not found' });
     res.json(msg);
   } catch (err) {
     res.status(500).json({ message: err.message });

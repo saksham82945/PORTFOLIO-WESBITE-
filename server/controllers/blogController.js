@@ -21,7 +21,9 @@ export const getBlogBySlug = async (req, res) => {
 
 export const createBlog = async (req, res) => {
   try {
-    const blog = await Blog.create(req.body);
+    // Destructure only expected fields — prevents mass-assignment
+    const { title, slug, excerpt, content, category, coverImage, readTime, date, published } = req.body;
+    const blog = await Blog.create({ title, slug, excerpt, content, category, coverImage, readTime, date, published });
     res.status(201).json(blog);
   } catch (err) {
     res.status(400).json({ message: err.message });
@@ -30,7 +32,12 @@ export const createBlog = async (req, res) => {
 
 export const updateBlog = async (req, res) => {
   try {
-    const blog = await Blog.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const { title, slug, excerpt, content, category, coverImage, readTime, date, published } = req.body;
+    const blog = await Blog.findByIdAndUpdate(
+      req.params.id,
+      { title, slug, excerpt, content, category, coverImage, readTime, date, published },
+      { new: true, runValidators: true }
+    );
     if (!blog) return res.status(404).json({ message: 'Post not found' });
     res.json(blog);
   } catch (err) {

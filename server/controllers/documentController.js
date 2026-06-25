@@ -1,6 +1,7 @@
 import Document from '../models/Document.js';
 import fs from 'fs';
 import path from 'path';
+import { safePath } from '../utils/safePath.js';
 
 export const getDocuments = async (req, res) => {
   try {
@@ -39,8 +40,15 @@ export const deleteDocument = async (req, res) => {
       return res.status(404).json({ message: 'Document not found' });
     }
 
+    // Validate path to prevent path traversal attacks
+    const uploadsDir = path.join(process.cwd(), 'uploads');
+    const filePath = safePath(document.fileName, uploadsDir);
+
+    if (!filePath) {
+      return res.status(400).json({ message: 'Invalid file path detected' });
+    }
+
     // Delete file from filesystem
-    const filePath = path.join(process.cwd(), 'uploads', document.fileName);
     if (fs.existsSync(filePath)) {
       fs.unlinkSync(filePath);
     }
