@@ -9,6 +9,7 @@ import contactRoutes from './routes/contact.js';
 import authRoutes from './routes/auth.js';
 import documentRoutes from './routes/documents.js';
 import path from 'path';
+import fs from 'fs';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -75,6 +76,13 @@ app.use('/api/documents', documentRoutes);
 // ── Serve Client in Production ───────────────────────────
 if (process.env.NODE_ENV === 'production') {
   const clientDist = path.join(__dirname, '..', 'client', 'dist');
+  console.log('📂 NODE_ENV:', process.env.NODE_ENV);
+  console.log('📂 __dirname:', __dirname);
+  console.log('📂 clientDist path:', clientDist);
+  console.log('📂 clientDist exists:', fs.existsSync(clientDist));
+  if (fs.existsSync(clientDist)) {
+    console.log('📂 clientDist contents:', fs.readdirSync(clientDist));
+  }
   app.use(express.static(clientDist));
   app.get('/{*path}', (req, res) => {
     // Don't intercept API or upload routes
