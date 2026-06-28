@@ -416,6 +416,30 @@ h1, h2, h3, h4, h5, h6 {
   font-size: 14px;
 }
 
+/* ── Admin Select / Dropdown Fix ──────────────────────── */
+select {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888888' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 32px !important;
+  cursor: pointer;
+}
+
+select option {
+  background: #0A0A1E;
+  color: #FFFFFF;
+  padding: 8px 12px;
+  border: none;
+}
+
+select option:hover,
+select option:checked {
+  background: #7F77DD;
+  color: #FFFFFF;
+}
+
 /* ─────────────────────────────────────────────────────── */
 /*  RESPONSIVE UTILITIES                                   */
 /* ─────────────────────────────────────────────────────── */

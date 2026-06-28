@@ -121,9 +121,16 @@ const AdminDashboard = ({ admin, onLogout }) => {
     if (!window.confirm('Delete this project?')) return;
     try {
       await api.delete(`/projects/${id}`);
+      // Optimistic removal + refetch to ensure sync
       setProjects(ps => ps.filter(p => p._id !== id));
+      // Also refetch to guarantee consistency
+      const { data } = await api.get('/projects');
+      setProjects(data);
     } catch (err) {
+      console.error('Delete failed:', err);
       alert(err.response?.data?.message || 'Failed to delete project');
+      // Refetch in case of partial state
+      fetchAll();
     }
   };
 
@@ -132,8 +139,12 @@ const AdminDashboard = ({ admin, onLogout }) => {
     try {
       await api.delete(`/blog/${id}`);
       setBlogs(bs => bs.filter(b => b._id !== id));
+      const { data } = await api.get('/blog');
+      setBlogs(data);
     } catch (err) {
+      console.error('Delete failed:', err);
       alert(err.response?.data?.message || 'Failed to delete post');
+      fetchAll();
     }
   };
 
@@ -142,8 +153,12 @@ const AdminDashboard = ({ admin, onLogout }) => {
     try {
       await api.delete(`/documents/${id}`);
       setDocuments(ds => ds.filter(d => d._id !== id));
+      const { data } = await api.get('/documents');
+      setDocuments(data);
     } catch (err) {
+      console.error('Delete failed:', err);
       alert(err.response?.data?.message || 'Failed to delete document');
+      fetchAll();
     }
   };
 
