@@ -18,7 +18,7 @@ export const PERSONAL = {
   links: {
     github:   "https://github.com/saksham82945",   // ✏️ YOUR GITHUB URL
     linkedin: "https://www.linkedin.com/in/saksham-kumar007/",   // ✏️ YOUR LINKEDIN URL
-    twitter:  "https://twitter.com/sakshamkumar",        // ✏️ YOUR TWITTER URL (or remove)
+    twitter:  "https://x.com/SakshamKum20674",        // ✏️ YOUR TWITTER URL (or remove)
     instagram: "",                                        // ✏️ optional
     leetcode:  "",                                        // ✏️ optional
     portfolio: "https://sakshamkumar.dev",                // ✏️ your live site URL
