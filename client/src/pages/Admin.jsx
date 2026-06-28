@@ -1,6 +1,75 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../utils/api';
+
+// ── Custom Select Dropdown (browsers won't style <option>) ───
+const CustomSelect = ({ value, onChange, options, style }) => {
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (ref.current && !ref.current.contains(e.target)) setOpen(false);
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  return (
+    <div ref={ref} style={{ position: 'relative', ...style }}>
+      <div
+        onClick={() => setOpen(!open)}
+        style={{
+          width: '100%', background: 'rgba(255,255,255,0.03)',
+          border: '1px solid var(--border)', borderRadius: 8,
+          padding: '10px 14px', color: 'var(--white)', fontFamily: 'Inter',
+          fontSize: 13, cursor: 'pointer', display: 'flex',
+          justifyContent: 'space-between', alignItems: 'center',
+          borderColor: open ? 'var(--purple)' : 'var(--border)',
+          transition: 'border-color 0.2s',
+        }}
+      >
+        <span>{value}</span>
+        <span style={{ color: 'var(--muted)', fontSize: 10, transform: open ? 'rotate(180deg)' : 'rotate(0)', transition: 'transform 0.2s' }}>▼</span>
+      </div>
+      {open && (
+        <div style={{
+          position: 'absolute', top: '100%', left: 0, right: 0, marginTop: 4,
+          background: '#0A0A1E', border: '1px solid var(--purple)',
+          borderRadius: 8, overflow: 'hidden', zIndex: 100,
+          boxShadow: '0 8px 32px rgba(127,119,221,0.2)',
+        }}>
+          {options.map(opt => (
+            <div
+              key={opt}
+              onClick={() => { onChange(opt); setOpen(false); }}
+              style={{
+                padding: '10px 14px', cursor: 'pointer', fontSize: 13,
+                fontFamily: 'Inter', transition: 'all 0.15s',
+                color: value === opt ? '#fff' : 'var(--muted)',
+                background: value === opt ? 'var(--purple)' : 'transparent',
+              }}
+              onMouseOver={e => {
+                if (value !== opt) {
+                  e.currentTarget.style.background = 'rgba(127,119,221,0.15)';
+                  e.currentTarget.style.color = '#fff';
+                }
+              }}
+              onMouseOut={e => {
+                if (value !== opt) {
+                  e.currentTarget.style.background = 'transparent';
+                  e.currentTarget.style.color = 'var(--muted)';
+                }
+              }}
+            >
+              {opt}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
 
 // ── Login Page ───────────────────────────────────────────────
 const AdminLogin = ({ onLogin }) => {
@@ -436,11 +505,13 @@ const AdminDashboard = ({ admin, onLogout }) => {
                     }
                   </div>
                 ))}
-                <div>
+                <div style={{ marginBottom: 12 }}>
                   <label style={{ fontFamily: 'JetBrains Mono', fontSize: 10, color: 'var(--muted)', letterSpacing: '0.1em', display: 'block', marginBottom: 6 }}>CATEGORY</label>
-                  <select value={form.category || 'Full Stack'} onChange={e => setForm(f => ({ ...f, category: e.target.value }))} style={{ ...inputStyle }}>
-                    {['Full Stack', 'Frontend', 'Backend', 'Three.js'].map(c => <option key={c}>{c}</option>)}
-                  </select>
+                  <CustomSelect
+                    value={form.category || 'Full Stack'}
+                    onChange={(val) => setForm(f => ({ ...f, category: val }))}
+                    options={['Full Stack', 'Frontend', 'Backend', 'Three.js']}
+                  />
                 </div>
                 <div>
                   <label style={{ fontFamily: 'JetBrains Mono', fontSize: 10, color: 'var(--muted)', letterSpacing: '0.1em', display: 'block', marginBottom: 6 }}>TAGS (comma separated)</label>
@@ -489,11 +560,13 @@ const AdminDashboard = ({ admin, onLogout }) => {
                   <label style={{ fontFamily: 'JetBrains Mono', fontSize: 10, color: 'var(--muted)', letterSpacing: '0.1em', display: 'block', marginBottom: 6 }}>TITLE</label>
                   <input type="text" value={form.title || ''} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} style={inputStyle} placeholder="Leave empty to use file name" />
                 </div>
-                <div>
+                <div style={{ marginBottom: 12 }}>
                   <label style={{ fontFamily: 'JetBrains Mono', fontSize: 10, color: 'var(--muted)', letterSpacing: '0.1em', display: 'block', marginBottom: 6 }}>CATEGORY</label>
-                  <select value={form.category || 'Resume'} onChange={e => setForm(f => ({ ...f, category: e.target.value }))} style={{ ...inputStyle }}>
-                    {['Resume', 'CV', 'Project Report', 'Certificate', 'Other'].map(c => <option key={c}>{c}</option>)}
-                  </select>
+                  <CustomSelect
+                    value={form.category || 'Resume'}
+                    onChange={(val) => setForm(f => ({ ...f, category: val }))}
+                    options={['Resume', 'CV', 'Project Report', 'Certificate', 'Other']}
+                  />
                 </div>
                 <div>
                   <label style={{ fontFamily: 'JetBrains Mono', fontSize: 10, color: 'var(--muted)', letterSpacing: '0.1em', display: 'block', marginBottom: 6 }}>FILE</label>
